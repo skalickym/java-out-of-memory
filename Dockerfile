@@ -19,6 +19,10 @@ WORKDIR /oom
 
 VOLUME [ "/dump" ]
 
-ENV _JAVA_OPTIONS="-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/dump/dump.bin -XX:+ExitOnOutOfMemoryError -Xmx128m"
+ARG dump_filename=dump.bin
 
-CMD [ "java","-jar","/oom/CrunchifyGenerateOOM.jar" ]
+ENV dump_filename ${dump_filename}
+
+ENV _JAVA_OPTIONS="-XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError -Xmx128m"
+
+CMD [ "sh", "-c", "java -XX:HeapDumpPath=/dump/${dump_filename} -jar /oom/CrunchifyGenerateOOM.jar" ]
