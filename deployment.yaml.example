@@ -1,0 +1,83 @@
+{
+    "apiVersion": "extensions/v1beta1",
+    "kind": "Deployment",
+    "metadata": {
+        "labels": {
+            "app": "oom-test",
+            "buildTimestamp": "2019-10-16-0734",
+            "heritage": "Tiller",
+            "team": "blue"
+        },
+        "name": "oom-test",
+        "namespace": "oom-namespace"
+    },
+    "spec": {
+        "replicas": 1,
+        "selector": {
+            "matchLabels": {
+                "app": "oom-test"
+            }
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "oom-test",
+                    "buildTimestamp": "2019-12-04-1634",
+                    "release": "master",
+                    "releaseId": "development",
+                    "version": ""
+                }
+            },
+            "spec": {
+               "containers": [
+                    {
+                        "env": [
+                            {
+                                "name": "POD_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "dump_filename",
+                                "value": "dump_$(POD_NAME).bin"
+                            }
+                        ],
+                        "image": "marcelskalicky/java-out-of-memory:latest",
+                        "imagePullPolicy": "Always",
+                        "name": "oom-test",
+                        "resources": {
+                            "limits": {
+                                "cpu": "10m",
+                                "memory": "150Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "10Mi"
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dump",
+                                "name": "uploaddir",
+                                "subPath": "blue/oom-test"
+                            }
+                        ]
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/tmp/diagnostics",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "uploaddir"
+                    }
+                ]
+            }
+        }
+    }
+}
